@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 namespace OBA.User.Core.Interfaces
 {
     public interface IAuthService
-    {
-        Task<bool> Register(RegisterRequest user);
+    { 
         Task<string> SignIn(SIgnInRequest sign);
     }
 }

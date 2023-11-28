@@ -9,7 +9,6 @@ namespace OBA.User.Core.Interfaces.Repos
 {
     public  interface IauthRepos
     {
-       Task<bool> Register(RegisterRequest user);
         Task<string> SignIn(SIgnInRequest sign);
 
     }

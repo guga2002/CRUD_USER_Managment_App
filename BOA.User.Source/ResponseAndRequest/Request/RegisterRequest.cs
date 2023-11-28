@@ -25,5 +25,16 @@ namespace BOA.User.Source.ResponseAndRequest.Request
         public string Lastname { get; set; }
         public string PersonalNumber { get; set; }
 
+        public string NameofCompanie { get; set; }
+
+        public string CatchPhrase { get; set; }
+
+        public string BS { get; set; }
+
+        public string street { get; set; }
+        public string suite { get; set; }
+        public string zipcode { get; set; }
+        public string city { get; set; }
+
     }
 }

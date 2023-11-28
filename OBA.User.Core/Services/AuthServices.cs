@@ -17,10 +17,6 @@ namespace OBA.User.Core.Services
         {
             repos = rep;
         }
-       public  async Task<bool> Register(RegisterRequest user)
-        {
-            return await repos.Register(user);
-        }
         public async Task<string> SignIn(SIgnInRequest sign)
         {
             return await repos.SignIn(sign);

@@ -15,22 +15,22 @@ namespace OBA.User.UI.Controllers
         {
             service = ser;  
         }
-
-        [HttpPost("Register")]
-        public async Task<IActionResult> Register(RegisterRequest user)
-        {
-            var res = await service.Register(user);
-            if (res == false) return BadRequest(" no success");
-            return Ok(res);
-        }
-
         [HttpPost("SignIn")]
-        public async Task<IActionResult> SignIn(SIgnInRequest sign)
+        public async Task<IActionResult> SignIn(SIgnInRequest sign)//shesvlas ar chirdeba avtorizacia
         {
-            var res=await service.SignIn(sign);
-            if (res == null)
-                return NotFound("signinfailed");
-            return Ok(res); 
+            try
+            {
+                var res = await service.SignIn(sign);
+                if (res == null)
+                    return NotFound("signinfailed");
+                return Ok(res);
+            }
+            catch (Exception)
+            {
+                return StatusCode(100, "somethings goes wrong");
+                throw;
+            }
+           
         }
     }
 }

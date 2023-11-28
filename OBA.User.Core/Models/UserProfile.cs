@@ -22,10 +22,16 @@ namespace OBA.User.Core.Models
         [StringLength(11)]
         [Required]
         public string PersonalNumber { get; set; }
-
-        [ForeignKey("users")]
-        public  string UserID { get; set; }
-
         public Useri users { get; set; }
+
+        [ForeignKey("address")]
+        public int AddressID { get; set; }
+
+        public Address address { get; set; }
+
+        [ForeignKey("company")]
+        public int CompanieID { get; set; }
+
+        public Company company { get; set; }
     }
 }

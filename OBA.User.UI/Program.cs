@@ -1,4 +1,7 @@
-﻿using BOA.User.Persistance.Repositories.Auth;
+﻿using BOA.User.Persistance.Repositories.AdminTools;
+using BOA.User.Persistance.Repositories.Auth;
+using BOA.User.Persistance.Repositories.User;
+using BOA.User.Persistance.Repositories.UserResourcesManage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +13,7 @@ using OBA.User.Core.Models;
 using OBA.User.Core.Services;
 using OBA.User.Infrastructure.Data.DbContexti;
 using OBA.User.Presentation.ErrorAndLogRepos.Error;
-using OBA.User.Presentation.ErrorAndLogRepos.Log;
+using OBA.User.Presentation.ErrorAndLogRepos.LOg;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,14 +64,21 @@ builder.Services.AddScoped<IAuthService, AuthServices>();
 builder.Services.AddScoped<IauthRepos, AuthRepos>();
 builder.Services.AddScoped<IerrorRepos, ErrorRepos>();
 builder.Services.AddScoped<IErrorservice, ErrorServices>();
-builder.Services.AddScoped<ILogRepos, Logrepos>();
+builder.Services.AddScoped<ILogRepos, LoggerRepos>();
 builder.Services.AddScoped<ILoggerServices, LoggerServices>();
+builder.Services.AddScoped<IuserRepos, UserRepositorie>();
+builder.Services.AddScoped<IUserServices, UserServices>();
+builder.Services.AddScoped<IRegUserRepos, ManageResourcesRepos>();
+builder.Services.AddScoped<IregUserServices, RegUserServices>();
+builder.Services.AddScoped<IAdminRepos, AdminRepos>();
+builder.Services.AddScoped<IAdminService, AdminServices>();
+
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
     opt.UseSqlServer(builder.Configuration.GetConnectionString("GugasConnect"));
 });
 
-builder.Services.AddIdentity<Useri, IdentityRole>(io =>
+builder.Services.AddIdentity<Useri,Identityroleb>(io =>
 {
     io.Password.RequiredLength = 5;
 }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
@@ -90,6 +100,14 @@ builder.Services.AddAuthentication(ops =>
         ValidAudience = builder.Configuration.GetSection("Jwt:Audience").Value,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Jwt:key").Value)),
     };
+});
+builder.Services.AddAuthorization(ops =>
+{
+    ops.AddPolicy("UserOnly", policy => policy.RequireRole("USER"));
+});
+builder.Services.AddAuthorization(ops =>
+{
+    ops.AddPolicy("AdminOnly", policy => policy.RequireRole("ADMIN"));
 });
 
 
