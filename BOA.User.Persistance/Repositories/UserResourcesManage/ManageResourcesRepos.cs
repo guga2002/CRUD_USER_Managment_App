@@ -1,6 +1,7 @@
 ﻿using BOA.User.Source.ResponseAndRequest.Request;
 using BOA.User.Source.ResponseAndRequest.Response;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using OBA.User.Core.Interfaces.Repos;
 using OBA.User.Infrastructure.Data.DbContexti;
 namespace BOA.User.Persistance.Repositories.UserResourcesManage
@@ -8,43 +9,53 @@ namespace BOA.User.Persistance.Repositories.UserResourcesManage
     public  class ManageResourcesRepos: IRegUserRepos
     {
         private readonly AppDbContext _db;
+        private readonly IerrorRepos error;
+        private readonly ILogRepos logger;
 
-        public ManageResourcesRepos(AppDbContext db)
+        public ManageResourcesRepos(AppDbContext db, IerrorRepos error, ILogRepos logger)
         {
             _db = db;
+            this.error = error;
+            this.logger = logger;
         }
         #region GetPosts
         public List<UserPostResponse> GetPosts(GetPostsRequest req)
         {
+            
             try
             {
+
                 List<UserPostResponse> resp = new List<UserPostResponse>();
                 var posts = _db.Posts.Where(io => io.UserID == req.UserID).ToList();
-
                 foreach (var post in posts)
                 {
                     var response = new UserPostResponse();
-                    response.coments = new List<ComentsResponse>();
+                    Console.WriteLine("guga");
+                    var filtercoments = _db.Comments.Where(io => io.PostID == post.UserPostID).ToList();
 
-                    var filtercoments = post._coments.Where(io => io.PostID == post.UserPostID).Select(io =>
-                    new ComentsResponse()
+                    foreach (var item in filtercoments)
                     {
-                        Email = io.Email,
-                        Body = io.Body,
-                        Name = io.Name
-                    }).ToList();
-                    response.coments.AddRange(filtercoments);
+                        var temp = new ComentsResponse()
+                        {
+                            Email = item.Email,
+                            Body = item.Body,
+                            Name = item.Name,
+                        };
+                        response.coments.Add(temp);
+                    }
+
                     response.Body = post.Body;
                     response.Tittle = post.Tittle;
 
                     resp.Add(response);
                 }
+                logger.Action("successfully get Users Posts and coments", Source.HelperEnum.typeEnums.Easy);
                 return resp;
 
             }
             catch (Exception exp)
             {
-
+                error.Action(exp.Message, Source.HelperEnum.typeEnums.Easy);
                 throw exp;
             }
         }
@@ -65,12 +76,13 @@ namespace BOA.User.Persistance.Repositories.UserResourcesManage
                     iter.IScomplete = todo.IScomplete;
                     result.Add(iter);
                 }
+                logger.Action("Succesfully got users todo", Source.HelperEnum.typeEnums.debbuging);
                 return result;
 
             }
             catch (Exception exp)
             {
-
+                error.Action(exp.Message, Source.HelperEnum.typeEnums.Easy);
                 throw exp;
             }
         }
@@ -89,7 +101,7 @@ namespace BOA.User.Persistance.Repositories.UserResourcesManage
                 {
                     var iter = new AlbumResponse();
                     iter.Title = album.Title;
-                    var filterphot = album._photos.Where(io => io.AlbumID == album.AlbumID).Select(io =>
+                    var filterphot = _db.Photos.Where(io => io.AlbumID == album.AlbumID).Select(io =>
                     new PhotoResponse()
                     {
                         Tittle = io.Tittle,
@@ -100,12 +112,13 @@ namespace BOA.User.Persistance.Repositories.UserResourcesManage
                     iter.photos.AddRange(filterphot);
                     result.Add(iter);
                 }
+                logger.Action("GEt Users albums and pictures sucesfully",Source.HelperEnum.typeEnums.info);
                 return result;
 
             }
             catch (Exception exp)
             {
-
+                error.Action(exp.Message, Source.HelperEnum.typeEnums.Easy);
                 throw exp;
             }
         }

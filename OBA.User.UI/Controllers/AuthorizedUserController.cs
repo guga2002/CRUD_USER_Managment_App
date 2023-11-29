@@ -47,6 +47,7 @@ namespace OBA.User.UI.Controllers
                 var ID = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);// avtorizaciisas shevinaxe UserID
                 if (ID < 1) return BadRequest("somethings unusual happen");
                 ToDoRequest req = new ToDoRequest() { UserID = ID };
+                Console.WriteLine(req.UserID);
                 var res = serv.GetToDo(req);
                 if (res == null) return NotFound(" no ToDo found");
                 return Ok(res);

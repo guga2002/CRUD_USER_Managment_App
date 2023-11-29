@@ -3,15 +3,7 @@ using BOA.User.Source.ResponseAndRequest.Request;
 using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
 using OBA.User.Core.Interfaces.Repos;
-using OBA.User.Core.Models;
-using OBA.User.Core.Models.Resource;
 using OBA.User.Infrastructure.Data.DbContexti;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace BOA.User.Persistance.Repositories.AdminTools
 {
@@ -19,11 +11,16 @@ namespace BOA.User.Persistance.Repositories.AdminTools
     {
         private readonly AppDbContext db;
         private readonly IuserRepos rep;
+        private readonly IerrorRepos error;
+        private readonly ILogRepos logger;
 
-        public AdminRepos(AppDbContext db, IuserRepos re)
+        public AdminRepos(AppDbContext db, IuserRepos re, IerrorRepos rek,ILogRepos log)
         {
             this.db = db;
             rep = re;
+            error = rek;
+            logger = log;
+
         }
         #region InicializeUserInBase
         public async Task InicializeUSersAsync()
@@ -78,6 +75,7 @@ namespace BOA.User.Persistance.Repositories.AdminTools
                         foreach (var item in reqies)
                         {
                             await rep.Register(item);
+                            logger.Action($"have added user : {item.Username} \n", Source.HelperEnum.typeEnums.Easy);
 
                         }
                     }
@@ -88,6 +86,7 @@ namespace BOA.User.Persistance.Repositories.AdminTools
                 }
                 catch (Exception ex)
                 {
+                    error.Action(ex.Message, Source.HelperEnum.typeEnums.Hard);
                     throw ex;
                 }
             }
@@ -124,13 +123,16 @@ namespace BOA.User.Persistance.Repositories.AdminTools
                             }
                             else
                             {
+                                error.Action("msgavsi to do ukve arsebobs", Source.HelperEnum.typeEnums.medium);
                                 //msgavsi  todoukve arsebobda da agar davamatet siashi
                                 continue;
                             }
                         }
+                        logger.Action("Succesfully inicialized to do ", Source.HelperEnum.typeEnums.Easy);
                         return true;
 
                     }
+                    error.Action("No success while inicializing", Source.HelperEnum.typeEnums.Easy);
                     return false;
                 }
                 catch (Exception ex)
@@ -142,7 +144,6 @@ namespace BOA.User.Persistance.Repositories.AdminTools
         #endregion
 
         #region InicializeAlbum
-
         public bool InicializeAlbum(AlbumInicializeRequest req)
         {
             if (!db.Users.Any(io => io.Id == req.UserID)) return false;
@@ -175,13 +176,16 @@ namespace BOA.User.Persistance.Repositories.AdminTools
                                 continue;
                             }
                         }
+                        logger.Action("Successfully inicialized the album", Source.HelperEnum.typeEnums.info);
                         return true;
 
                     }
+                    error.Action("Failed to inicialize album",Source.HelperEnum.typeEnums.debbuging);
                     return false;
                 }
                 catch (Exception ex)
                 {
+                    error.Action(ex.Message, Source.HelperEnum.typeEnums.debbuging);
                 }
                 return false;
             }
@@ -224,19 +228,23 @@ namespace BOA.User.Persistance.Repositories.AdminTools
                                 }
                                 else
                                 {
+                                    error.Action($"msgavsi  chanaweri ukve arsebobs{phot.url}", Source.HelperEnum.typeEnums.Easy);
+
                                     //msgavsi  albomi arsebobda da agar davamatet siashi
                                     continue;
                                 }
                             }
                         }
-                    
+                        logger.Action(" Warmatebit inicializda fotoebi", Source.HelperEnum.typeEnums.info);
                         return true;
 
                     }
+                    error.Action(" Warumatebeli inicializeba fotoebis", Source.HelperEnum.typeEnums.medium);
                     return false;
                 }
                 catch (Exception ex)
                 {
+                    error.Action(ex.Message, Source.HelperEnum.typeEnums.Easy);
                 }
                 return false;
             }
@@ -273,11 +281,12 @@ namespace BOA.User.Persistance.Repositories.AdminTools
                                 }
                                 else
                                 {
-                                    //msgavsi  albomi arsebobda da agar davamatet siashi
-                                    continue;
+                                //msgavsi  albomi arsebobda da agar davamatet siashi
+                                error.Action("msgavsi  albomi arsebobda da agar davamatet siashi", Source.HelperEnum.typeEnums.info);
+                                continue;
                                 }
                             }
-
+                        logger.Action("succesfully inicialized", Source.HelperEnum.typeEnums.info);
                         return true;
 
                     }
@@ -285,6 +294,7 @@ namespace BOA.User.Persistance.Repositories.AdminTools
                 }
                 catch (Exception ex)
                 {
+                    error.Action(ex.Message, Source.HelperEnum.typeEnums.medium);
                 }
                 return false;
             }
@@ -330,12 +340,13 @@ namespace BOA.User.Persistance.Repositories.AdminTools
                                 }
                                 else
                                 {
-                                    //msgavsi  albomi arsebobda da agar davamatet siashi
+                                    //msgavsi  komentari arsebobda da agar davamatet siashi
+                                    error.Action("msgavsi  komentari arsebobda da agar davamatet siashi", Source.HelperEnum.typeEnums.debbuging);
                                     continue;
                                 }
                             }
                         }
-
+                        logger.Action("Succesfully  imported comentars",Source.HelperEnum.typeEnums.medium);
                         return true;
 
                     }
@@ -343,6 +354,7 @@ namespace BOA.User.Persistance.Repositories.AdminTools
                 }
                 catch (Exception ex)
                 {
+                    error.Action(ex.Message, Source.HelperEnum.typeEnums.medium);
                 }
                 return false;
             }

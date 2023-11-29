@@ -1,11 +1,15 @@
 ﻿using BOA.User.Source.HelperEnum;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using OBA.User.Core.Interfaces.Repos;
+using OBA.User.Core.Models;
 using OBA.User.Infrastructure.Data.DbContexti;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OBA.User.Core.Models;
+using BOA.User.Source.ResponseAndRequest.Request;
 
 namespace OBA.User.Presentation.ErrorAndLogRepos.Error
 {
@@ -27,6 +31,23 @@ namespace OBA.User.Presentation.ErrorAndLogRepos.Error
                 type = enm,
                 time = DateTime.Now
             });
+        }
+
+        public List<OBA.User.Core.Models.Error> GetAllErrors()
+        {
+            return _db.Errors.ToList();
+        }
+
+        public List<OBA.User.Core.Models.Error> GetErrorsWithDateRange(GetErrorsWithDateRange req)
+        {
+            var lst = _db.Errors.Where(io => io.time >= req.start && io.time <= req.end).ToList();
+            return lst;
+        }
+
+        public List<OBA.User.Core.Models.Error> GetErrorsByItType(GetErrorByItTypeRequest req)
+        {
+            var lst = _db.Errors.Where(io => io.type == req.errorType).ToList();
+            return lst;
         }
     }
 }

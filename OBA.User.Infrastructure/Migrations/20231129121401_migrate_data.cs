@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace OBA.User.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class mgrtad : Migration
+    public partial class migrate_data : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,10 +17,10 @@ namespace OBA.User.Infrastructure.Migrations
                 {
                     AddressID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    street = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    suite = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    zipcode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    city = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    street = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    suite = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    zipcode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    city = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -48,9 +48,9 @@ namespace OBA.User.Infrastructure.Migrations
                 {
                     CompanieID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CatchPhrase = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BS = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CatchPhrase = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BS = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -109,6 +109,35 @@ namespace OBA.User.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserProfiles",
+                columns: table => new
+                {
+                    userProfileID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Firstname = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Lastname = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PersonalNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    AddressID = table.Column<int>(type: "int", nullable: false),
+                    CompanieID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserProfiles", x => x.userProfileID);
+                    table.ForeignKey(
+                        name: "FK_UserProfiles_Addresses_AddressID",
+                        column: x => x.AddressID,
+                        principalTable: "Addresses",
+                        principalColumn: "AddressID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserProfiles_Companies_CompanieID",
+                        column: x => x.CompanieID,
+                        principalTable: "Companies",
+                        principalColumn: "CompanieID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
@@ -116,8 +145,7 @@ namespace OBA.User.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     action = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AddressID = table.Column<int>(type: "int", nullable: false),
-                    CompanieID = table.Column<int>(type: "int", nullable: false),
+                    ProfileID = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -137,16 +165,30 @@ namespace OBA.User.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_Addresses_AddressID",
-                        column: x => x.AddressID,
-                        principalTable: "Addresses",
-                        principalColumn: "AddressID",
+                        name: "FK_AspNetUsers_UserProfiles_ProfileID",
+                        column: x => x.ProfileID,
+                        principalTable: "UserProfiles",
+                        principalColumn: "userProfileID",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Albums",
+                columns: table => new
+                {
+                    AlbumID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Albums", x => x.AlbumID);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_Companies_CompanieID",
-                        column: x => x.CompanieID,
-                        principalTable: "Companies",
-                        principalColumn: "CompanieID",
+                        name: "FK_Albums_AspNetUsers_UserID",
+                        column: x => x.UserID,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -236,26 +278,95 @@ namespace OBA.User.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserProfiles",
+                name: "ToDos",
                 columns: table => new
                 {
-                    userProfileID = table.Column<int>(type: "int", nullable: false)
+                    ToDoID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Firstname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Lastname = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PersonalNumber = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IScomplete = table.Column<bool>(type: "bit", nullable: false),
                     UserID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserProfiles", x => x.userProfileID);
+                    table.PrimaryKey("PK_ToDos", x => x.ToDoID);
                     table.ForeignKey(
-                        name: "FK_UserProfiles_AspNetUsers_UserID",
+                        name: "FK_ToDos_AspNetUsers_UserID",
                         column: x => x.UserID,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "User_Posts",
+                columns: table => new
+                {
+                    UserPostID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Tittle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Body = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User_Posts", x => x.UserPostID);
+                    table.ForeignKey(
+                        name: "FK_User_Posts_AspNetUsers_UserID",
+                        column: x => x.UserID,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Photos",
+                columns: table => new
+                {
+                    PhotoID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Tittle = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    URL = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    thumbnailUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AlbumID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Photos", x => x.PhotoID);
+                    table.ForeignKey(
+                        name: "FK_Photos_Albums_AlbumID",
+                        column: x => x.AlbumID,
+                        principalTable: "Albums",
+                        principalColumn: "AlbumID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Coments",
+                columns: table => new
+                {
+                    ComentID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Body = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PostID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Coments", x => x.ComentID);
+                    table.ForeignKey(
+                        name: "FK_Coments_User_Posts_PostID",
+                        column: x => x.PostID,
+                        principalTable: "User_Posts",
+                        principalColumn: "UserPostID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Albums_UserID",
+                table: "Albums",
+                column: "UserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -290,15 +401,9 @@ namespace OBA.User.Infrastructure.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_AddressID",
+                name: "IX_AspNetUsers_ProfileID",
                 table: "AspNetUsers",
-                column: "AddressID",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_CompanieID",
-                table: "AspNetUsers",
-                column: "CompanieID",
+                column: "ProfileID",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -309,9 +414,35 @@ namespace OBA.User.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserProfiles_UserID",
+                name: "IX_Coments_PostID",
+                table: "Coments",
+                column: "PostID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Photos_AlbumID",
+                table: "Photos",
+                column: "AlbumID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ToDos_UserID",
+                table: "ToDos",
+                column: "UserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_Posts_UserID",
+                table: "User_Posts",
+                column: "UserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProfiles_AddressID",
                 table: "UserProfiles",
-                column: "UserID",
+                column: "AddressID",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProfiles_CompanieID",
+                table: "UserProfiles",
+                column: "CompanieID",
                 unique: true);
         }
 
@@ -334,19 +465,34 @@ namespace OBA.User.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Coments");
+
+            migrationBuilder.DropTable(
                 name: "Errors");
 
             migrationBuilder.DropTable(
                 name: "Logs");
 
             migrationBuilder.DropTable(
-                name: "UserProfiles");
+                name: "Photos");
+
+            migrationBuilder.DropTable(
+                name: "ToDos");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "User_Posts");
+
+            migrationBuilder.DropTable(
+                name: "Albums");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "UserProfiles");
 
             migrationBuilder.DropTable(
                 name: "Addresses");

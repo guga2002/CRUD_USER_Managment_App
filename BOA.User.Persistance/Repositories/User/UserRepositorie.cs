@@ -14,23 +14,28 @@ namespace BOA.User.Persistance.Repositories.User
         private readonly AppDbContext _DB;
         private readonly UserManager<Useri> _usermanager;
         private readonly RoleManager<Identityroleb> _rolemanager;
+        private readonly ILogRepos log;
+        private readonly IerrorRepos error;
 
-        public UserRepositorie(UserManager<Useri> _usr, AppDbContext database, RoleManager<Identityroleb> role)
+        public UserRepositorie(UserManager<Useri> _usr, AppDbContext database, RoleManager<Identityroleb> role, ILogRepos rep, IerrorRepos er)
         {
             _usermanager = _usr;
             _rolemanager = role;
             _DB = database;
+            log = rep;
+            error = er;
         }
 
         #region RegisterUser
         public async Task<bool> Register(RegisterRequest user)
         {
-           // using (var transact = _DB.Database.BeginTransaction())
+            using (var transact = _DB.Database.BeginTransaction())
             {
                 try
                 {
                     if(_DB.Profiles.Any(io => io.PersonalNumber == user.PersonalNumber))
                     {
+                        error.Action("Msgavsi user ukve arsebobs bazashi", Source.HelperEnum.typeEnums.medium);
                         return false;
                     }
 
@@ -101,11 +106,11 @@ namespace BOA.User.Persistance.Repositories.User
 
                         if (res.Succeeded)
                         {
-                            // Check if the role exists, and create it if it doesn't
+                           
                             string role = user.Role.ToUpper();
                             if (role == "ADMIN" || role == "USER" || role == "MODERATOR" || role == "GUEST" || role == "MANAGER")
                             {
-                                await Console.Out.WriteLineAsync("roli  validuria");
+                              
 
                                 var roleExists = await _rolemanager.RoleExistsAsync(user.Role.ToUpper());
 
@@ -116,7 +121,7 @@ namespace BOA.User.Persistance.Repositories.User
 
                                     if (!roleResult.Succeeded)
                                     {
-                                       // transact.Rollback();
+                                       transact.Rollback();
                                         return false;
                                     }
                                 }
@@ -125,19 +130,21 @@ namespace BOA.User.Persistance.Repositories.User
 
                                 await Console.Out.WriteLineAsync("warmatebit daemata");
                                 await _DB.SaveChangesAsync();
-                               // transact.Commit();
+                               transact.Commit();
+                                log.Action("Warmatebuli registracia bazashi ", Source.HelperEnum.typeEnums.info);
                                 return true;
                             }
                         }
                     }
-                    //error.Action("Warumatebeli registracia", Source.HelperEnum.typeEnums.debbuging);
-                    //transact.Rollback();
+                    error.Action("Warumatebeli registracia", Source.HelperEnum.typeEnums.debbuging);
+                    transact.Rollback();
                     return false;
 
                 }
                 catch (Exception exp)
                 {
-                    //transact.Rollback();
+                    transact.Rollback();
+                    error.Action(exp.Message, Source.HelperEnum.typeEnums.Hard);
                     throw exp;
                 }
             }
@@ -159,7 +166,10 @@ namespace BOA.User.Persistance.Repositories.User
                     if (user != null)
                     {
                         if (user.IsActive == false)
+                        {
+                            error.Action("User ar aris aqtiuri amitomac ver Vnaxavt profils", Source.HelperEnum.typeEnums.debbuging);
                             return null;
+                        }
                     }
                     var resp = _DB.Profiles.Where(io => io.PersonalNumber == req.PersonalNumber).Select(io =>
                     new UserViewResponse()
@@ -175,16 +185,18 @@ namespace BOA.User.Persistance.Repositories.User
                         zipcode = io.address.zipcode,
                         Name = io.company.Name
                     }).FirstOrDefault();
+                    log.Action($"Successfully take user data: {resp.Name + ' ' + resp.PersonalNumber}", Source.HelperEnum.typeEnums.info);
                     return resp;
                 }
                 else
                 {
+                    error.Action("Useri ar arsebobs bazashi msgavs monacemebze", Source.HelperEnum.typeEnums.Easy);
                     return null;
                 }
             }
             catch (Exception exp)
             {
-
+                error.Action(exp.Message, Source.HelperEnum.typeEnums.medium);
                 throw exp;
             }
         }
@@ -205,7 +217,10 @@ namespace BOA.User.Persistance.Repositories.User
                         if (user != null)
                         {
                             if (user.IsActive == false)
+                            {
+                                error.Action("User ar aris aqtiuri amitomac ver davaredaqtirebt", Source.HelperEnum.typeEnums.debbuging);
                                 return false;
+                            }
                         }
 
                         var userprofile = _DB.Profiles.Where(io => io.PersonalNumber == req.PersonalNumber).FirstOrDefault();
@@ -224,6 +239,7 @@ namespace BOA.User.Persistance.Repositories.User
 
                             _DB.SaveChanges();
                             transac.Commit();
+                            log.Action("Warmatebit daredaqtirda useri",Source.HelperEnum.typeEnums.Easy);
                             return true;
                         }
                         transac.Rollback();
@@ -239,6 +255,7 @@ namespace BOA.User.Persistance.Repositories.User
                 catch (Exception exp)
                 {
                     transac.Rollback();
+                    error.Action(exp.Message, Source.HelperEnum.typeEnums.debbuging);
                     throw exp;
                 }
             }
@@ -260,14 +277,16 @@ namespace BOA.User.Persistance.Repositories.User
                     {
                         usr.IsActive = false;
                         _DB.SaveChanges();
+                        log.Action($"User{usr.Id} succesfully soft deleted", Source.HelperEnum.typeEnums.medium);
                         return true;
                     }
                 }
+                error.Action($"No USer found in this index:{ind} ", Source.HelperEnum.typeEnums.Hard);
                 return false;
             }
             catch (Exception exp)
             {
-
+                error.Action(exp.Message, Source.HelperEnum.typeEnums.Hard);
                 throw exp;
             }
         }
@@ -286,14 +305,17 @@ namespace BOA.User.Persistance.Repositories.User
                     {
                         _DB.Remove(usr);
                         _DB.SaveChanges();
+                        log.Action($"Successfully permanently delete  user {usr.Id} ", Source.HelperEnum.typeEnums.Easy);
                         return true;
                     }
                 }
+                error.Action(" no user Exist", Source.HelperEnum.typeEnums.medium);
                 return false;
 
             }
             catch (Exception exp)
             {
+                error.Action(exp.Message, Source.HelperEnum.typeEnums.Hard);
 
                 throw exp;
             }

@@ -12,8 +12,8 @@ using OBA.User.Infrastructure.Data.DbContexti;
 namespace OBA.User.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231128150120_mgrtadjd")]
-    partial class mgrtadjd
+    [Migration("20231129185633_migrate_dataa")]
+    partial class migrate_dataa
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

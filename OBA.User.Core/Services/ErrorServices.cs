@@ -1,11 +1,8 @@
-﻿using BOA.User.Source.HelperEnum;
+﻿
+using BOA.User.Source.ResponseAndRequest.Request;
 using OBA.User.Core.Interfaces;
 using OBA.User.Core.Interfaces.Repos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OBA.User.Core.Models;
 
 namespace OBA.User.Core.Services
 {
@@ -18,9 +15,19 @@ namespace OBA.User.Core.Services
                 this.rep=rep;
         }
 
-        public void Action(string mesage, typeEnums enm)
+        public List<Error> GetAllErrors()
         {
-            rep.Action(mesage, enm);
+            return rep.GetAllErrors();
+        }
+
+        public List<Error> GetErrorsByItType(GetErrorByItTypeRequest req)
+        {
+            return rep.GetErrorsByItType(req);
+        }
+
+        public List<Error> GetErrorsWithDateRange(GetErrorsWithDateRange req)
+        {
+            return rep.GetErrorsWithDateRange(req);
         }
     }
 }

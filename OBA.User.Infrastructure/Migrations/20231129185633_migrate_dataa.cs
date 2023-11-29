@@ -5,7 +5,7 @@
 namespace OBA.User.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class mgrt : Migration
+    public partial class migrate_dataa : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

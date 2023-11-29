@@ -9,6 +9,6 @@ namespace BOA.User.Source.ResponseAndRequest.Response
     public class AlbumResponse
     {
         public string Title { get; set; }
-        public List<PhotoResponse> photos {get;set;}
+        public List<PhotoResponse> photos { get; set; } = new List<PhotoResponse>();
     }
 }

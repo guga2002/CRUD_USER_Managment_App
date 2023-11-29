@@ -41,6 +41,7 @@ namespace OBA.User.UI.Controllers
                 return StatusCode(100, exp.Message);
             }
         }
+
         [HttpPost("View")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "UserOnly")]
         public IActionResult ViewProfile(ViewProfileRequest req)

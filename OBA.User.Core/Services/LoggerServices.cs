@@ -1,11 +1,8 @@
 ﻿using BOA.User.Source.HelperEnum;
+using BOA.User.Source.ResponseAndRequest.Request;
 using OBA.User.Core.Interfaces;
 using OBA.User.Core.Interfaces.Repos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OBA.User.Core.Models;
 
 namespace OBA.User.Core.Services
 {
@@ -13,9 +10,25 @@ namespace OBA.User.Core.Services
     {
         private readonly ILogRepos rep;
 
-       public  void Action(string mesage, typeEnums enm)
+        public LoggerServices(ILogRepos rep)
         {
-            rep.Action(mesage, enm);
+            this.rep = rep;
+                
+        }
+
+        public List<Log> GetAllLogs()
+        {
+            return rep.GetAllLogs();
+        }
+
+        public List<Log> GetLogsByDateRange(GetLogsRequest req)
+        {
+            return rep.GetLogsByDateRange(req);
+        }
+
+        public List<Log> GetLogsByItType(GetLogsByittyperequest req)
+        {
+            return rep.GetLogsByItType(req);
         }
     }
 }

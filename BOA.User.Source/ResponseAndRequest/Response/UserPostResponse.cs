@@ -11,6 +11,6 @@ namespace BOA.User.Source.ResponseAndRequest.Response
         public string Tittle { get; set; }
         public string Body { get; set; }
 
-        public List<ComentsResponse> coments;
+        public List<ComentsResponse> coments { get; set; }=new List<ComentsResponse>() { };
     }
 }

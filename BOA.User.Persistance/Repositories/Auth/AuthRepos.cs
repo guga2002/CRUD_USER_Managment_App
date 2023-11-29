@@ -37,7 +37,11 @@ namespace BOA.User.Persistance.Repositories.Auth
             {
 
                 var res = await _usermanager.FindByNameAsync(sign.Username);
-                if (res == null) return null;
+                if (res == null)
+                {
+                    error.Action($"No user exist in this username{sign.Username}", Source.HelperEnum.typeEnums.medium);
+                    return " ";
+                }
 
                 var checkedpass = await _usermanager.CheckPasswordAsync(res, sign.Password);
                 if (checkedpass)
@@ -47,19 +51,23 @@ namespace BOA.User.Persistance.Repositories.Auth
                     {
                         await Console.Out.WriteLineAsync(rolik.First());
                         var re = await GenerateJwtToken(res, rolik.First());
-                        if (re == null) return null;
+                        if (re == null)
+                        {
+                            error.Action(" NO JWT Token   generated", Source.HelperEnum.typeEnums.medium);
+                            return null;
+                        }
+                        log.Action($"Successfully  signed in user {sign.Username}", Source.HelperEnum.typeEnums.medium);
                         return re;
                     }
                     error.Action("role is null there", Source.HelperEnum.typeEnums.Easy);
-                    await Console.Out.WriteLineAsync("role is null there");
                 }
 
-                return null;
+                return " ";
 
             }
             catch (Exception exp)
             {
-
+                error.Action(exp.Message, Source.HelperEnum.typeEnums.Easy);
                 throw exp;
             }
 
@@ -72,7 +80,6 @@ namespace BOA.User.Persistance.Repositories.Auth
             try
             {
 
-
                 if (user != null)
                 {
                     var profile = db.Profiles.Where(io => io.userProfileID == user.Id).FirstOrDefault();
@@ -80,13 +87,11 @@ namespace BOA.User.Persistance.Repositories.Auth
                     {
               new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
               new Claim(ClaimTypes.Name, user.UserName),
-              new Claim(ClaimTypes.GivenName,profile.PersonalNumber),
+               new Claim(ClaimTypes.GivenName,profile.PersonalNumber),
               new Claim(ClaimTypes.Role,Role),
 
             };
-
-                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("Jwt:key").Value));
-
+                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetSection("Jwt").GetSection("Key").Value));
                     var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
                     var token = new JwtSecurityToken(
@@ -96,12 +101,14 @@ namespace BOA.User.Persistance.Repositories.Auth
                         expires: DateTime.Now.AddDays(1),
                         signingCredentials: credentials
                     );
+                    log.Action(" succesfully generated  User JWT", Source.HelperEnum.typeEnums.medium);
                     return new JwtSecurityTokenHandler().WriteToken(token);
                 }
-                return null;
+                return null ;
             }
             catch (Exception exp)
             {
+                error.Action(exp.Message, Source.HelperEnum.typeEnums.Easy);
 
                 throw exp;
             }

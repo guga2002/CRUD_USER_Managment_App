@@ -1,5 +1,6 @@
 ﻿using BOA.User.Source.ResponseAndRequest.Request;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OBA.User.Core.Interfaces;
 
@@ -7,6 +8,7 @@ namespace OBA.User.UI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminOnly")]
     public class AdminToolsController : ControllerBase
     {
         private readonly IAdminService ser;
