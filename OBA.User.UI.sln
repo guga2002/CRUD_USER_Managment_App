@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BOA.User.Source", "BOA.User
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OBA.User.Presentation", "OBA.User.Presentation\OBA.User.Presentation.csproj", "{E1A2BB72-92BA-46B6-A052-DD40295C4D4B}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "BOA.User.SQL", "BOA.User.SQL\BOA.User.SQL.sqlproj", "{09DD02AC-F867-4D39-BFD2-6FECA9A4E67C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,12 +45,6 @@ Global
 		{E1A2BB72-92BA-46B6-A052-DD40295C4D4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1A2BB72-92BA-46B6-A052-DD40295C4D4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1A2BB72-92BA-46B6-A052-DD40295C4D4B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09DD02AC-F867-4D39-BFD2-6FECA9A4E67C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09DD02AC-F867-4D39-BFD2-6FECA9A4E67C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09DD02AC-F867-4D39-BFD2-6FECA9A4E67C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{09DD02AC-F867-4D39-BFD2-6FECA9A4E67C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09DD02AC-F867-4D39-BFD2-6FECA9A4E67C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09DD02AC-F867-4D39-BFD2-6FECA9A4E67C}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

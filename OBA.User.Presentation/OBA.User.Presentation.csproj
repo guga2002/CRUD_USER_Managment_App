@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BOA.User.SQL\BOA.User.SQL.sqlproj" />
     <ProjectReference Include="..\OBA.User.Infrastructure\OBA.User.Infrastructure.csproj" />
   </ItemGroup>
 
