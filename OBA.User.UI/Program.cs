@@ -19,6 +19,8 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+#region Cors
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
@@ -27,8 +29,11 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+#endregion
+
 builder.Services.AddEndpointsApiExplorer();
+
+#region Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Guga's CRUD", Version = "v1" });
@@ -66,6 +71,9 @@ builder.Services.AddSwaggerGen(c =>
         }, new List<string>() }
     });
 });
+#endregion
+
+#region Scopes
 builder.Services.AddScoped<IAuthService, AuthServices>();
 builder.Services.AddScoped<IauthRepos, AuthRepos>();
 builder.Services.AddScoped<IerrorRepos, ErrorRepos>();
@@ -78,11 +86,16 @@ builder.Services.AddScoped<IRegUserRepos, ManageResourcesRepos>();
 builder.Services.AddScoped<IregUserServices, RegUserServices>();
 builder.Services.AddScoped<IAdminRepos, AdminRepos>();
 builder.Services.AddScoped<IAdminService, AdminServices>();
+#endregion
 
+#region DbCOntext
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
     opt.UseSqlServer(builder.Configuration.GetConnectionString("GugasConnect"));
 });
+#endregion
+
+#region Identity
 
 builder.Services.AddIdentity<Useri,Identityroleb>(io =>
 {
@@ -107,6 +120,10 @@ builder.Services.AddAuthentication(ops =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Jwt:key").Value)),
     };
 });
+#endregion
+
+#region Authorization
+
 builder.Services.AddAuthorization(ops =>
 {
     ops.AddPolicy("UserOnly", policy => policy.RequireRole("USER"));
@@ -115,6 +132,8 @@ builder.Services.AddAuthorization(ops =>
 {
     ops.AddPolicy("AdminOnly", policy => policy.RequireRole("ADMIN"));
 });
+
+#endregion
 
 
 var app = builder.Build();
